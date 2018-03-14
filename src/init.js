@@ -1,3 +1,4 @@
+"use strict";
 var path = require('path');
 var fs = require('fs');
 var os = require('os');
@@ -25,9 +26,10 @@ var moduleNames = [
   'dapps',
   'sql',
   'blocks',
+  'qrcode'
 ];
 
-function getPublicIp() {
+function getPublicIp() { //获取公网IP
   var publicIp = null;
   try {
     var ifaces = os.networkInterfaces();
@@ -74,11 +76,11 @@ module.exports = function(options, done) {
 
     protobuf: function (cb) {
       var protobuf = require('./utils/protobuf.js');
-      protobuf(options.protoFile, cb);
+      protobuf(options.protoFile, cb); //protobuf格式文件 转化为核心数据对象并返回
     },
 
-    scheme: function (cb) {
-      z_schema.registerFormat("hex", function (str) {
+    scheme: function (cb) { //验证
+      z_schema.registerFormat("hex", function (str) { //16进制数
         var b = null
         try {
           b = new Buffer(str, "hex");
@@ -89,7 +91,7 @@ module.exports = function(options, done) {
         return b && b.length > 0;
       });
 
-      z_schema.registerFormat('publicKey', function (str) {
+      z_schema.registerFormat('publicKey', function (str) { //32位16进制数
         if (str.length == 0) {
           return true;
         }
@@ -103,7 +105,7 @@ module.exports = function(options, done) {
         }
       });
 
-      z_schema.registerFormat('splitarray', function (str) {
+      z_schema.registerFormat('splitarray', function (str) { //分割1000条以内
         try {
           var a = str.split(',');
           if (a.length > 0 && a.length <= 1000) {
@@ -116,7 +118,7 @@ module.exports = function(options, done) {
         }
       });
 
-      z_schema.registerFormat('signature', function (str) {
+      z_schema.registerFormat('signature', function (str) { //64位16进制数
         if (str.length == 0) {
           return true;
         }
@@ -139,7 +141,7 @@ module.exports = function(options, done) {
         return true;
       });
 
-      z_schema.registerFormat('checkInt', function (value) {
+      z_schema.registerFormat('checkInt', function (value) { //整数
         if (isNaN(value) || parseInt(value) != value || isNaN(parseInt(value, 10))) {
           return false;
         }
@@ -155,20 +157,20 @@ module.exports = function(options, done) {
       cb(null, new z_schema())
     },
 
-    network: ['config', function (cb, scope) {
+    network: ['config', function (cb, scope) { //网络初始化
       var express = require('express');
-      var compression = require('compression');
-      var cors = require('cors');
+      var compression = require('compression'); //传输压缩控件
+      var cors = require('cors'); //跨域控件
       var app = express();
       
-      app.use(compression({ level: 6 }));
+      app.use(compression({ level: 6 })); //level压缩水平
       app.use(cors());
-      app.options("*", cors());
+      app.options("*", cors()); // include before other routes
 
-      var server = require('http').createServer(app);
-      var io = require('socket.io')(server);
+      var server = require('http').createServer(app); //http服务
+      var io = require('socket.io')(server); //sicket服务
 
-      if (scope.config.ssl.enabled) {
+      if (scope.config.ssl.enabled) { //支持ssl
         var privateKey = fs.readFileSync(scope.config.ssl.options.key);
         var certificate = fs.readFileSync(scope.config.ssl.options.cert);
 
@@ -193,7 +195,7 @@ module.exports = function(options, done) {
       });
     }],
 
-    dbSequence: ["logger", function (cb, scope) {
+    dbSequence: ["logger", function (cb, scope) { //看起来是用来协助数据库序列的封装方法
       var sequence = new Sequence({
         name: "db",
         onWarning: function (current, limit) {
@@ -203,7 +205,7 @@ module.exports = function(options, done) {
       cb(null, sequence);
     }],
 
-    sequence: ["logger", function (cb, scope) {
+    sequence: ["logger", function (cb, scope) {  //看起来是用来协助普通任务序列的封装方法
       var sequence = new Sequence({
         name: "normal",
         onWarning: function (current, limit) {
@@ -213,7 +215,7 @@ module.exports = function(options, done) {
       cb(null, sequence);
     }],
 
-    balancesSequence: ["logger", function (cb, scope) {
+    balancesSequence: ["logger", function (cb, scope) {   //看起来是用来协助资产任务序列的封装方法
       var sequence = new Sequence({
         name: "balance",
         onWarning: function (current, limit) {
@@ -224,7 +226,7 @@ module.exports = function(options, done) {
     }],
 
     connect: ['config', 'genesisblock', 'logger', 'network', function (cb, scope) {
-      var bodyParser = require('body-parser');
+      var bodyParser = require('body-parser'); //post body 处理模块
       var methodOverride = require('method-override');
       var requestSanitizer = require('./utils/request-sanitizer');
       var queryParser = require('./utils/express-query-int');
@@ -254,9 +256,9 @@ module.exports = function(options, done) {
         }
       }));
 
-      scope.network.app.use(require('./utils/zscheme-express.js')(scope.scheme));
+      scope.network.app.use(require('./utils/zscheme-express.js')(scope.scheme)); //加sanitize 验证中间层
 
-      scope.network.app.use(function (req, res, next) {
+      scope.network.app.use(function (req, res, next) { //接口统一预处理
         var parts = req.url.split('/');
         var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
@@ -286,7 +288,7 @@ module.exports = function(options, done) {
           scope.logger.debug("Response pre-flight request");
           return;
         }
-
+        //黑白名单
         var isApiOrPeer = parts.length > 1 && (parts[1] == 'api'|| parts[1] == 'peer') ;
         var whiteList = scope.config.api.access.whiteList;
         var blackList = scope.config.peers.blackList;
@@ -334,8 +336,8 @@ module.exports = function(options, done) {
 
     }],
 
-    bus: function (cb) {
-      var changeCase = require('change-case');
+    bus: function (cb) { //绑定触发事件， 有点搞
+      var changeCase = require('change-case'); //字符处理控件
 
       class Bus extends EventEmitter {
         message() {
@@ -343,7 +345,7 @@ module.exports = function(options, done) {
           Array.prototype.push.apply(args, arguments);
           var topic = args.shift();
           modules.forEach(function (module) {
-            var eventName = 'on' + changeCase.pascalCase(topic);
+            var eventName = 'on' + changeCase.pascalCase(topic); //test string =》TestString
             if (typeof (module[eventName]) == 'function') {
               module[eventName].apply(module[eventName], args);
             }
@@ -354,7 +356,7 @@ module.exports = function(options, done) {
       cb(null, new Bus)
     },
 
-    dbLite: function (cb) {
+    dbLite: function (cb) { //数据库
       var dbLite = require('./utils/dblite-helper.js');
       dbLite.connect(dbFile, cb);
     },
@@ -368,16 +370,17 @@ module.exports = function(options, done) {
       cb(null, new BalanceManager)
     },
 
-    model: ['dbLite', function (cb, scope) {
+    model: ['dbLite', function (cb, scope) { //封装数据处理
       var Model = require('./utils/model.js')
-      cb(null, new Model(scope.dbLite))
+      cb(null, new Model(scope.dbLite)) 
     }],
 
     base: ['dbLite', 'bus', 'scheme', 'genesisblock', function (cb, scope) {
       var Transaction = require('./base/transaction.js');
       var Block = require('./base/block.js');
       var Account = require('./base/account.js');
-      var Consensus = require('./base/consensus.js');
+      var Consensus = require('./base/consensus.js'); //共识
+      var QRcode = require('./base/qrcode.js'); //共识
 
       async.auto({
         bus: function (cb) {
@@ -405,6 +408,9 @@ module.exports = function(options, done) {
         }],
         block: ["dbLite", "bus", "scheme", 'genesisblock', "account", "transaction", function (cb, scope) {
           new Block(scope, cb);
+        }],
+        qrcode: ["dbLite", "bus", "scheme", 'genesisblock', function (cb, scope) {
+          new QRcode(scope, cb);
         }]
       }, cb);
     }],
