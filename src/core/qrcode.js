@@ -66,8 +66,8 @@ private.attachApi = function () {
           }
           var qrcodes = raw.map(function (fullQRcode) {
             return {
-                _id: fullAccount._id,
-                off: fullAccount.off
+                _id: fullQRcode._id,
+                off: fullQRcode.off
             }
           });
   
