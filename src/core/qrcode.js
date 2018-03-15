@@ -84,6 +84,15 @@ private.attachApi = function () {
         return res.json({ success: true, count: rows[0].count });
       })
     });
+
+    router.post('/set', function(req, res){
+        modules.qrcode.setQRcodeAndGet(req.body, function (err, rows) {
+            if (err || !rows) {
+                return res.status(500).send({success: false, error: 'Database error'})
+              }
+            return res.json({ success: true, data: rows });
+        });
+    });
   
     router.use(function (req, res, next) {
       res.status(500).send({ success: false, error: "API endpoint was not found" });
