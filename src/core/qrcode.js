@@ -16,6 +16,7 @@ function QRcodes(cb, scope) {
     setImmediate(cb, null, self);
 }
 
+
 private.qrcodeCache = {};
 // Private methods
 private.attachApi = function () {
@@ -254,7 +255,6 @@ QRcodes.prototype.applyQRcode = function (qrcode, broadcast, callback) {
         library.logger.debug("save qrcode ok");
     });
 }
-
 
 shared.getQRcode = function (req, cb) {
     var query = req.body;

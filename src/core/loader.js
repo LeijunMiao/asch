@@ -444,7 +444,12 @@ private.loadBlockChain = function (cb) {
       });
     }
   });
-
+  
+  library.base.qrcode.createTables(function(err){
+    if (err) {
+      throw err;
+    } 
+  });
 }
 
 // Public methods
