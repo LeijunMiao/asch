@@ -1,3 +1,4 @@
+"use strict";
 var bignum = require('bignumber')
 var Tmdb = require('./tmdb.js')
 

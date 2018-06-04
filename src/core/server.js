@@ -36,6 +36,10 @@ private.attachApi = function() {
     }
   });
 
+  router.get('/qrcode', function (req, res) {
+    res.render('qrcode.html');
+  });
+
   router.get('/api/blocks/totalsupply', function (req, res) {
     res.status(200).send('' + modules.blocks.getSupply() / 100000000);
   });

@@ -1,3 +1,4 @@
+"use strict";
 const LOG_ADD_PATH = 1
 const LOG_SET_VALUE = 2
 

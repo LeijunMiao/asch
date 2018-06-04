@@ -63,7 +63,7 @@ Transaction.prototype.create = function (data) {
   return trs;
 }
 
-Transaction.prototype.attachAssetType = function (typeId, instance) {
+Transaction.prototype.attachAssetType = function (typeId, instance) { //添加交易类型
   if (instance && typeof instance.create == 'function' && typeof instance.getBytes == 'function' &&
     typeof instance.calculateFee == 'function' && typeof instance.verify == 'function' &&
     typeof instance.objectNormalize == 'function' && typeof instance.dbRead == 'function' &&
@@ -467,7 +467,7 @@ Transaction.prototype.verifyBytes = function (bytes, publicKey, signature) {
   return res;
 }
 
-Transaction.prototype.apply = function (trs, block, sender, cb) {
+Transaction.prototype.apply = function (trs, block, sender, cb) { //交易生效，修改数据库中相关字段，比如balance等
   if (!private.types[trs.type]) {
     return setImmediate(cb, "Unknown transaction type " + trs.type);
   }
@@ -494,7 +494,7 @@ Transaction.prototype.apply = function (trs, block, sender, cb) {
   }.bind(this));
 }
 
-Transaction.prototype.undo = function (trs, block, sender, cb) {
+Transaction.prototype.undo = function (trs, block, sender, cb) { //交易回滚
   if (!private.types[trs.type]) {
     return setImmediate(cb, "Unknown transaction type " + trs.type);
   }

@@ -29,7 +29,7 @@ private.getAddressByPublicKey = function (publicKey) {
 
 // Public methods
 
-Block.prototype.sortTransactions = function (data) {
+Block.prototype.sortTransactions = function (data) { //排序待确认交易
   return data.transactions.sort(function compare(a, b) {
     if (a.type != b.type) {
       if (a.type == 1) {
@@ -75,21 +75,21 @@ Block.prototype.create = function (data) {
   }
 
   var block = {
-    version: 0,
-    totalAmount: totalAmount,
-    totalFee: totalFee,
-    reward: reward,
-    payloadHash: payloadHash.digest().toString('hex'),
-    timestamp: data.timestamp,
+    version: 0, 
+    totalAmount: totalAmount, //累计打包交易的总金额
+    totalFee: totalFee, //累加的打包交易的总手续费
+    reward: reward, //本次产块的给旷工的奖励
+    payloadHash: payloadHash.digest().toString('hex'), //区块hash，是通过之前打包的交易计算出来。
+    timestamp: data.timestamp,  
     numberOfTransactions: blockTransactions.length,
     payloadLength: size,
-    previousBlock: data.previousBlock.id,
-    generatorPublicKey: data.keypair.publicKey.toString('hex'),
-    transactions: blockTransactions
+    previousBlock: data.previousBlock.id, //上一个区块的id
+    generatorPublicKey: data.keypair.publicKey.toString('hex'), //该区块生产者的公钥
+    transactions: blockTransactions //打包的交易列表
   };
 
   try {
-    block.blockSignature = this.sign(block, data.keypair);
+    block.blockSignature = this.sign(block, data.keypair); // 区块签名，签名需要用到当前旷工的私钥，并打包上该区块的主要信息中打出的签名
 
     block = this.objectNormalize(block);
   } catch (e) {
@@ -316,7 +316,7 @@ Block.prototype.getHash = function (block) {
 }
 
 Block.prototype.calculateFee = function (block) {
-  return 10000000;
+  return 10000000; //0.1 XAS
 }
 
 Block.prototype.dbRead = function (raw) {

@@ -209,7 +209,7 @@ private.loadBlocks = function (lastBlock, cb) {
       if (lastBlock.id != private.genesisBlock.block.id) { // Have to find common block
         private.findUpdate(lastBlock, data.peer, cb);
       } else { // Have to load full db
-        private.loadFullDb(data.peer, cb);
+        private.loadFullDb(data.peer, cb); //全量同步区块
       }
     } else {
       cb();
@@ -378,7 +378,7 @@ private.loadBlockChain = function (cb) {
     });
   }
 
-  library.base.account.createTables(function (err) {
+  library.base.account.createTables(function (err) { //初始化 base/account 数据库相关表。
     if (err) {
       throw err;
     } else {
@@ -389,7 +389,7 @@ private.loadBlockChain = function (cb) {
 
         var reject = !(rows[0].count);
 
-        modules.blocks.count(function (err, count) {
+        modules.blocks.count(function (err, count) { // 查看数据库里面的 block 数量，赋值给变量 count
           if (err) {
             return library.logger.error('Failed to count blocks', err)
           }
@@ -409,27 +409,27 @@ private.loadBlockChain = function (cb) {
                   library.logger.info("Failed to verify db integrity 1");
                   load(count);
                 } else {
-                  library.dbLite.query("select a.blockId, b.id from mem_accounts a left outer join blocks b on b.id = a.blockId where b.id is null", {}, ['a_blockId', 'b_id'], function (err, rows) {
+                  library.dbLite.query("select a.blockId, b.id from mem_accounts a left outer join blocks b on b.id = a.blockId where b.id is null", {}, ['a_blockId', 'b_id'], function (err, rows) { //检查 “mem_accounts” 里面是否存在 blockId 为 null 的异常数据，如果有，则开始load
                     if (err || rows.length > 0) {
                       library.logger.error(err || "Encountered missing block, looks like node went down during block processing");
                       library.logger.info("Failed to verify db integrity 2");
                       load(count);
                     } else {
                       // Load delegates
-                      library.dbLite.query("SELECT lower(hex(publicKey)) FROM mem_accounts WHERE isDelegate=1", ['publicKey'], function (err, delegates) {
+                      library.dbLite.query("SELECT lower(hex(publicKey)) FROM mem_accounts WHERE isDelegate=1", ['publicKey'], function (err, delegates) { //检查 “mem_accounts” 是否缺少受托人
                         if (err || delegates.length == 0) {
                           library.logger.error(err || "No delegates, reload database");
                           library.logger.info("Failed to verify db integrity 3");
                           load(count);
                         } else {
-                          modules.blocks.loadBlocksOffset(1, count, verify, function (err, lastBlock) {
+                          modules.blocks.loadBlocksOffset(1, count, verify, function (err, lastBlock) { //通过 modules.blocks.loadBlocksOffset 载入区块
                             if (err) {
                               library.logger.error(err || "Unable to load last block");
                               library.logger.info("Failed to verify db integrity 4");
                               load(count);
                             } else {
                               library.logger.info('Blockchain ready');
-                              private.loadBalances(cb);
+                              private.loadBalances(cb); //所以其实 loadBalances 就是把之前落地到磁盘的 “mem_accounts” 中记录的账号金额信息， 载入到内存数据库 tmdb 中，为了后续的快速查询
                             }
                           });
                         }
@@ -483,9 +483,10 @@ Loader.prototype.onPeerReady = function () {
     if (slots.getNextSlot() - lastSlot >= 3) {
       self.startSyncBlocks();
     }
-    setTimeout(nextSync, 10 * 1000);
+    setTimeout(nextSync, 10 * 1000); //同步区块，10s触发一次。
   });
 
+  //载入未确认交易，14s触发一次。对应函数 loadUnconfirmedTransactions ，这个好理解，就是需要定时从 peer 节点获取未确认的交易列表，为之后区块产生打包交易做准备。
   setImmediate(function nextLoadUnconfirmedTransactions() {
     if (!private.loaded || self.syncing()) return;
     private.loadUnconfirmedTransactions(function (err) {
@@ -495,6 +496,7 @@ Loader.prototype.onPeerReady = function () {
 
   });
 
+  //载入签名，14s触发一次。对应函数 loadSignatures ，从peer节点获取交易id和签名的映射列表。
   setImmediate(function nextLoadSignatures() {
     if (!private.loaded) return;
     private.loadSignatures(function (err) {

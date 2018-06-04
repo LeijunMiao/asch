@@ -547,6 +547,20 @@ private.attachApi = function () {
     });
   });
 
+  router.post("/qrcode", function (req, res) {
+    res.set(private.headers);
+
+    var peerIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    var peerStr = peerIp ? peerIp + ":" + (isNaN(parseInt(req.headers['port'])) ? 'unkwnown' : parseInt(req.headers['port'])) : 'unknown';
+    if (typeof req.body.qrcode == 'string') {
+      req.body.qrcode = library.protobuf.decodeQRcode(new Buffer(req.body.qrcode, 'base64'));
+    }
+    var qrcode = req.body.qrcode 
+    library.bus.message('receiveQRcode', qrcode);
+
+    res.sendStatus(200);
+  });
+
   router.use(function (req, res, next) {
     res.status(500).send({ success: false, error: "API endpoint not found" });
   });
@@ -779,6 +793,20 @@ Transport.prototype.onNewBlock = function (block, votes, broadcast) {
     library.network.io.sockets.emit('blocks/change', {});
   }
 }
+
+Transport.prototype.onNewQRcode = function (qrcode, broadcast) {
+  if (broadcast) {
+      var data = {
+          qrcode: library.protobuf.encodeQRcode(qrcode).toString('base64'),
+      };
+      self.broadcast({}, {
+          api: '/qrcode',
+          data: data,
+          method: "POST"
+      });
+      library.network.io.sockets.emit('qrcode/change', {});
+  }
+};
 
 Transport.prototype.onNewPropose = function (propose, broadcast) {
   if (broadcast) {

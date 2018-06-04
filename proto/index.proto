@@ -165,3 +165,9 @@ message BlockVoteSignature {
   required bytes key = 1;
   required bytes sig = 2;
 }
+
+message QRcode {
+  required string _id = 1;
+  required int32  off = 2;
+  optional string blockId = 3;
+}

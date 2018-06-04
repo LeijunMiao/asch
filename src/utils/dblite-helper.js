@@ -107,7 +107,7 @@ module.exports.connect = function (connectString, cb) {
 
     var migration = {};
 
-    db.query("PRAGMA user_version", function (err, rows) {
+    db.query("PRAGMA user_version", function (err, rows) { //PRAGMA 控制各种环境变量和状态标志
       if (err) {
         return cb(err);
       }

@@ -33,6 +33,16 @@ Protobuf.prototype.decodeBlock = function (data) {
   return obj;
 }
 
+Protobuf.prototype.encodeQRcode = function (qrcode) {
+  var obj = extend(true, {}, qrcode);
+  return this.schema.QRcode.encode(obj);
+}
+
+Protobuf.prototype.decodeQRcode = function (data) {
+  var obj = this.schema.QRcode.decode(data);
+  return obj;
+}
+
 Protobuf.prototype.encodeBlockPropose = function (propose) {
   var obj = extend(true, {}, propose);
   obj.generatorPublicKey = new Buffer(obj.generatorPublicKey, 'hex');
