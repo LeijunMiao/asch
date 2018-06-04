@@ -118,6 +118,7 @@ private.attachApi = function () {
                     error: 'Database error'
                 })
             }
+            console.log('setQRcodeAndGet');
             library.bus.message('newQRcode', doc, true);
             return res.json({
                 success: true,
@@ -206,6 +207,7 @@ QRcodes.prototype.onBind = function (scope) {
 }
 
 QRcodes.prototype.onReceiveQRcode = function (qrcode, votes) {
+    console.log('onReceiveQRcode');
     if (modules.loader.syncing() || !private.loaded) {
         return;
     }
@@ -224,14 +226,17 @@ QRcodes.prototype.onReceiveQRcode = function (qrcode, votes) {
 
 
 QRcodes.prototype.processQRcode = function (qrcode, broadcast, cb) {
+    console.log('processQRcode');
     try {
         qrcode = library.base.qrcode.objectNormalize(qrcode);
     } catch (e) {
         return setImmediate(cb, "Failed to normalize qrcode : " + e.toString());
     }
+    console.log(qrcode);
     self.getQRcode({
         _id: qrcode._id
     }, function (err, row) {
+        console.log(row);
         if (err) {
             return setImmediate(cb, "Failed to query qrcodes from db: " + err);
         }
@@ -239,11 +244,12 @@ QRcodes.prototype.processQRcode = function (qrcode, broadcast, cb) {
         if (qrId) {
             return setImmediate(cb, "QRcode already exists: " + qrcode._id);
         }
-        self.applyQRcode(block, broadcast, cb);
+        self.applyQRcode(qrcode, broadcast, cb);
     });
 }
 
 QRcodes.prototype.applyQRcode = function (qrcode, broadcast, callback) {
+    console.log('applyQRcode');
     private.isActive = true;
     library.dbLite.query('SAVEPOINT applyqrcode');
     library.base.qrcode.dbSave(qrcode, function (err) {
