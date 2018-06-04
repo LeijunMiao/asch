@@ -81,8 +81,8 @@ private.attachApi = function () {
                 }
                 var qrcodes = raw.map(function (fullQRcode) {
                     return {
-                        _id: fullAccount._id,
-                        off: fullAccount.off
+                        _id: fullQRcode._id,
+                        off: fullQRcode.off
                     }
                 });
 
@@ -110,18 +110,18 @@ private.attachApi = function () {
             });
         })
     });
-    router.get('/set', function (req, res) {
+    router.post('/set', function (req, res) {
         self.setQRcodeAndGet(req.body, function (err, doc) {
-            if (err || !rows) {
+            if (err || !doc) {
                 return res.status(500).send({
                     success: false,
                     error: 'Database error'
                 })
             }
-            library.bus.message('newQRcode', rows, true);
+            library.bus.message('newQRcode', doc, true);
             return res.json({
                 success: true,
-                qrcode: rows
+                qrcode: doc
             });
         })
     });
