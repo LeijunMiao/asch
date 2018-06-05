@@ -18,6 +18,7 @@ function QRcodes(cb, scope) {
 
 
 private.qrcodeCache = {};
+private.loaded = false;
 // Private methods
 private.attachApi = function () {
     var router = new Router();
@@ -204,6 +205,8 @@ QRcodes.prototype.sandboxApi = function (call, args, cb) {
 // Events
 QRcodes.prototype.onBind = function (scope) {
     modules = scope;
+
+    private.loaded = true;
 }
 
 QRcodes.prototype.onReceiveQRcode = function (qrcode, votes) {
