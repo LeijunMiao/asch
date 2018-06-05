@@ -10,10 +10,7 @@
     }
   },
   "peers": {
-    "list": [{
-      "ip":"47.96.132.15",
-      "port":"4096"
-    }],
+    "list": [],
     "blackList": [],
     "options": {
       "timeout": 4000
@@ -147,3 +144,4 @@
     "params": {}
   }
 }
+

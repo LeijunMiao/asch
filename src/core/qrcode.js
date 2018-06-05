@@ -208,6 +208,8 @@ QRcodes.prototype.onBind = function (scope) {
 
 QRcodes.prototype.onReceiveQRcode = function (qrcode, votes) {
     console.log('onReceiveQRcode');
+    console.log(modules.loader.syncing(),private.loaded,private.qrcodeCache[qrcode._id]);
+
     if (modules.loader.syncing() || !private.loaded) {
         return;
     }
@@ -258,6 +260,7 @@ QRcodes.prototype.applyQRcode = function (qrcode, broadcast, callback) {
             process.exit(1);
             return;
         }
+        private.qrcodeCache = {};
         library.logger.debug("save qrcode ok");
     });
 }
