@@ -280,4 +280,13 @@ QRcode.prototype.objectNormalize = function (qrcode) {
     return qrcode;
 }
 
+QRcode.prototype.dbSave = function (qrcode, cb) {
+
+    this.scope.dbLite.query("INSERT INTO qrcode(_id, off, blockId) VALUES($_id, $off, $blockId)", {
+        _id: qrcode._id,
+        off: qrcode.off || false,
+        blockId: qrcode.blockId || null,
+    }, cb);
+}
+
 module.exports = QRcode;
