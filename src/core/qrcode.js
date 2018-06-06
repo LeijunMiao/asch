@@ -89,7 +89,7 @@ private.attachApi = function () {
 
                 res.json({
                     success: true,
-                    qrcodes: fullQRcode
+                    qrcodes: raw
                 });
             })
         })
