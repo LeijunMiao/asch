@@ -39,6 +39,22 @@ function QRcode(scope, cb) {
             },
             conv: String,
             default: genesisBlock.id
+        },
+        {
+            name: "batch",
+            type: "String",
+            filter: {
+                type: "string",
+            },
+            conv: String
+        },
+        {
+            name: "goods",
+            type: "String",
+            filter: {
+                type: "string"
+            },
+            conv: String
         }
     ];
 
@@ -269,6 +285,12 @@ QRcode.prototype.objectNormalize = function (qrcode) {
             },
             blockId: {
                 type: "string"
+            },
+            batch: {
+                type: "string"
+            },
+            goods: {
+                type: "string"
             }
         },
         required: ['_id']
@@ -283,10 +305,12 @@ QRcode.prototype.objectNormalize = function (qrcode) {
 
 QRcode.prototype.dbSave = function (qrcode, cb) {
 
-    this.scope.dbLite.query("INSERT INTO qrcode(_id, off, blockId) VALUES($_id, $off, $blockId)", {
+    this.scope.dbLite.query("INSERT INTO qrcode(_id, off, blockId, batch, goods) VALUES($_id, $off, $blockId, $batch, $goods)", {
         _id: qrcode._id,
         off: qrcode.off || false,
         blockId: qrcode.blockId || null,
+        blockId: qrcode.batch || '',
+        blockId: qrcode.goods || ''
     }, cb);
 }
 

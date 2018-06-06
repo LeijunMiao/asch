@@ -170,4 +170,6 @@ message QRcode {
   required string _id = 1;
   required int32  off = 2;
   optional string blockId = 3;
+  optional string btach = 4;
+  optional string goods = 5;
 }
