@@ -80,16 +80,16 @@ private.attachApi = function () {
                         error: err.toString()
                     });
                 }
-                var qrcodes = raw.map(function (fullQRcode) {
-                    return {
-                        _id: fullQRcode._id,
-                        off: fullQRcode.off
-                    }
-                });
+                // var qrcodes = raw.map(function (fullQRcode) {
+                //     return {
+                //         _id: fullQRcode._id,
+                //         off: fullQRcode.off
+                //     }
+                // });
 
                 res.json({
                     success: true,
-                    qrcodes: qrcodes
+                    qrcodes: fullQRcode
                 });
             })
         })
@@ -290,18 +290,9 @@ shared.getQRcode = function (req, cb) {
             if (err) {
                 return cb(err.toString());
             }
-            if (!qrcode) {
-                qrcode = {
-                    _id: query._id,
-                    off: query.off
-                }
-            }
 
             cb(null, {
-                qrcode: {
-                    _id: query._id,
-                    off: query.off
-                },
+                qrcode: qrcode,
                 version: modules.peer.getVersion()
             });
         });
