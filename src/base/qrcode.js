@@ -43,6 +43,7 @@ function QRcode(scope, cb) {
         {
             name: "batch",
             type: "String",
+            length: 128,
             filter: {
                 type: "string",
             },
@@ -51,6 +52,7 @@ function QRcode(scope, cb) {
         {
             name: "goods",
             type: "String",
+            length: 128,
             filter: {
                 type: "string"
             },
@@ -309,8 +311,8 @@ QRcode.prototype.dbSave = function (qrcode, cb) {
         _id: qrcode._id,
         off: qrcode.off || false,
         blockId: qrcode.blockId || null,
-        blockId: qrcode.batch || '',
-        blockId: qrcode.goods || ''
+        batch: qrcode.batch || '',
+        goods: qrcode.goods || ''
     }, cb);
 }
 
