@@ -30,9 +30,9 @@ private.attachApi = function() {
 
   router.get('/', function (req, res) {
     if (private.loaded) {
-      res.render('wallet.html', {layout: false});
+      res.render('dist/wallet.html', {layout: false});
     } else {
-      res.render('index.html');
+      res.render('dist/index.html');
     }
   });
 
@@ -40,8 +40,8 @@ private.attachApi = function() {
   //   res.render('qrcode.html');
   // });
 
-  app.get('/qrcode', function (req, res) {
-    res.sendFile(__dirname + '/public/src/qrcode.html');
+  router.get('/qrcode', function (req, res) {
+    res.render('src/qrcode.html');
 });
 
 // app.use(express.static(__dirname+ '/public/src'));
