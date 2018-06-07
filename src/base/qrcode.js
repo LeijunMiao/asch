@@ -224,7 +224,7 @@ QRcode.prototype.set = function (_id, fields, cb) {
     fields._id = _id;
     var qrcode = fields;
     var sqles = []
-    console.log('genesisBlock',genesisBlock);
+    // console.log('genesisBlock',genesisBlock);
     qrcode.blockId = genesisBlock.id;
     var sql = jsonSql.build({
         type: 'insert',

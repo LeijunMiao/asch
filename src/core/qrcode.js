@@ -222,15 +222,12 @@ QRcodes.prototype.onReceiveQRcode = function (qrcode, votes) {
     }
     private.qrcodeCache[qrcode._id] = true;
 
-    library.sequence.add(function receiveQRcode(cb) {
-        library.logger.info('Received new qrcode id: ' + qrcode._id);
-        self.processQRcode(qrcode, true, cb);
-    });
+    self.processQRcode(qrcode, true);
 }
 
 
 
-QRcodes.prototype.processQRcode = function (qrcode, broadcast, cb) {
+QRcodes.prototype.processQRcode = function (qrcode, broadcast) {
     console.log('processQRcode');
     try {
         qrcode = library.base.qrcode.objectNormalize(qrcode);
@@ -249,11 +246,11 @@ QRcodes.prototype.processQRcode = function (qrcode, broadcast, cb) {
         if (qrId) {
             return setImmediate(cb, "QRcode already exists: " + qrcode._id);
         }
-        self.applyQRcode(qrcode, broadcast, cb);
+        self.applyQRcode(qrcode, broadcast);
     });
 }
 
-QRcodes.prototype.applyQRcode = function (qrcode, broadcast, callback) {
+QRcodes.prototype.applyQRcode = function (qrcode, broadcast) {
     console.log('applyQRcode');
     private.isActive = true;
     library.dbLite.query('SAVEPOINT applyqrcode');
@@ -301,3 +298,4 @@ shared.getQRcode = function (req, cb) {
 
 // Export
 module.exports = QRcodes;
+
