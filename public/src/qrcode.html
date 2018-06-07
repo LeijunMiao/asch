@@ -212,12 +212,12 @@
                 </div>
             </main>
             <main role="main" id="page2" class="hide page bg-light col-md-9 ml-sm-auto col-lg-10 px-4">
-                    <div class="alert  alert-success alert-dismissible fade hide" role="alert" >
-                            <strong>提交成功!</strong> 
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="    padding: .5rem 1.25rem;">
-                              <span aria-hidden="true">&times;</span>
-                            </button>
-                          </div>
+                <div class="alert  alert-success alert-dismissible fade hide" role="alert">
+                    <strong>提交成功!</strong>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="    padding: .5rem 1.25rem;">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
                 <div class="py-5 text-center">
 
                     <h2>追溯码信息</h2>
@@ -277,11 +277,14 @@
         $(function () {
             var app = {
                 init: function () {
+
+
+                    // $('.alert').fadeIn();
                     // $('.alert').alert()
                     var self = this;
                     $('.nav-link').click(function () {
                         var to = $(this).attr('to');
-                        if(to == 'page1') self.list();
+                        if (to == 'page1') self.list();
                         $('.nav-link').removeClass('active');
                         $(this).addClass('active');
 
@@ -299,13 +302,14 @@
                 },
                 new: function (qrcode) {
                     $.post({
-                        url: 'http://47.96.132.15:4096/api/qrcodes/set',
+                        url: '/api/qrcodes/set', //http://114.55.253.187:4096
                         data: qrcode,
                         // dataType: 'json'
-                    },function(res){
+                    }, function (res) {
                         console.log(res);
                         if (res.success) {
-                            $('.alert').show();
+                            $('.alert').removeClass('hide');
+                            $('.alert').addClass('show');
                         }
                         // else $('.alert').alert()
                     })
@@ -316,7 +320,7 @@
                     //     method: 'POST' // This property is ignored
                     // });
                     $.get({
-                        url: 'http://47.96.132.15:4096/api/qrcodes/top',
+                        url: '/api/qrcodes/top',
                         method: 'GET',
                         // dataType: 'jsonp'
                     }, function (res, status) {

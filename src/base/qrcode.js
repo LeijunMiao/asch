@@ -303,14 +303,44 @@ QRcode.prototype.objectNormalize = function (qrcode) {
 }
 
 QRcode.prototype.dbSave = function (qrcode, cb) {
+    var self = this;
+    var sqles = []
+    var sql = jsonSql.build({
+        type: 'insert',
+        or: "ignore",
+        table: this.table,
+        values: qrcode
+    });
 
-    this.scope.dbLite.query("INSERT INTO qrcode(_id, off, blockId, batch, goods) VALUES($_id, $off, $blockId, $batch, $goods)", {
-        _id: qrcode._id,
-        off: qrcode.off || false,
-        blockId: qrcode.blockId || null,
-        batch: qrcode.batch || '',
-        goods: qrcode.goods || ''
+    sqles.push(sql);
+    var _id = qrcode._id;
+    var sql = jsonSql.build({
+        type: 'update',
+        table: this.table,
+        modifier: qrcode,
+        condition: {
+            _id: _id
+        }
+    });
+
+    sqles.push(sql);
+
+    async.eachSeries(sqles, function (sql, cb) {
+        self.scope.dbLite.query(sql.query, sql.values, function (err, data) {
+            if (err) {
+                console.error('qrcode set sql error:', err, sql);
+            }
+            cb(err, data);
+        });
     }, cb);
+    
+    // this.scope.dbLite.query("INSERT INTO qrcode(_id, off, blockId, batch, goods) VALUES($_id, $off, $blockId, $batch, $goods)", {
+    //     _id: qrcode._id,
+    //     off: qrcode.off || false,
+    //     blockId: qrcode.blockId || null,
+    //     batch: qrcode.batch || '',
+    //     goods: qrcode.goods || ''
+    // }, cb);
 }
 
 module.exports = QRcode;
