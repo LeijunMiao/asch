@@ -556,7 +556,7 @@ private.attachApi = function () {
       req.body.qrcode = library.protobuf.decodeQRcode(new Buffer(req.body.qrcode, 'base64'));
     }
     var qrcode = req.body.qrcode 
-    qrcode.blockId =  modules.blocks.getLastBlock;
+    
     library.bus.message('receiveQRcode', qrcode);
 
     res.sendStatus(200);

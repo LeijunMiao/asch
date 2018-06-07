@@ -188,6 +188,8 @@ QRcodes.prototype.setQRcodeAndGet = function (data, cb) {
     if (!_id) {
         return cb("Lost _id");
     }
+    data.blockId =  modules.blocks.getLastBlock;
+    console.log(data);
     library.base.qrcode.set(_id, data, function (err) {
         if (err) {
             return cb(err);
