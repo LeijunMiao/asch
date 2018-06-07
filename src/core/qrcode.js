@@ -255,7 +255,7 @@ QRcodes.prototype.processQRcode = function (qrcode, broadcast) {
 QRcodes.prototype.applyQRcode = function (qrcode, broadcast) {
     console.log('applyQRcode');
     private.isActive = true;
-    library.dbLite.query('SAVEPOINT applyqrcode');
+    // library.dbLite.query('SAVEPOINT applyqrcode');
     library.base.qrcode.dbSave(qrcode, function (err) {
         if (err) {
             library.logger.error("Failed to save qrcode: " + err);

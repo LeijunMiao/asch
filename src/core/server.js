@@ -36,9 +36,15 @@ private.attachApi = function() {
     }
   });
 
-  router.get('/qrcode', function (req, res) {
-    res.render('qrcode.html');
-  });
+  // router.get('/qrcode', function (req, res) {
+  //   res.render('qrcode.html');
+  // });
+
+  app.get('/qrcode', function (req, res) {
+    res.sendFile(__dirname + '/public/src/qrcode.html');
+});
+
+// app.use(express.static(__dirname+ '/public/src'));
 
   router.get('/api/blocks/totalsupply', function (req, res) {
     res.status(200).send('' + modules.blocks.getSupply() / 100000000);
