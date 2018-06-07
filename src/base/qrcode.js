@@ -1,10 +1,8 @@
 var async = require('async');
 var jsonSql = require('json-sql')();
-var genesisBlock = null;
 
 function QRcode(scope, cb) {
     this.scope = scope;
-    genesisBlock = this.scope.genesisblock.block;
 
     this.table = "qrcode";
     this.model = [{
@@ -37,8 +35,7 @@ function QRcode(scope, cb) {
                 minLength: 1,
                 maxLength: 64
             },
-            conv: String,
-            default: genesisBlock.id
+            conv: String
         },
         {
             name: "batch",
@@ -225,7 +222,7 @@ QRcode.prototype.set = function (_id, fields, cb) {
     var qrcode = fields;
     var sqles = []
     // console.log('genesisBlock',genesisBlock);
-    qrcode.blockId = genesisBlock.id;
+    // qrcode.blockId = genesisBlock.id;
     var sql = jsonSql.build({
         type: 'insert',
         or: "ignore",

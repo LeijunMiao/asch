@@ -298,4 +298,3 @@ shared.getQRcode = function (req, cb) {
 
 // Export
 module.exports = QRcodes;
-
